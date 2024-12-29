@@ -3,7 +3,7 @@ import random
 import time
 from copy import deepcopy
 
-from tictactoe_game import TicTacToeGame, Games, Game, Coup
+from tictactoe_game import TicTacToeGame, Games, Game, Coup, Partie, JoueurAleatoire, JoueurSimple
 
 
 # Press Maj+F10 to execute it or replace it with your code.
@@ -54,7 +54,7 @@ def coup_suivant(joueur, jeux, listeCoups, games):
         jeux2.joue(joueur, coup[0], coup[1])
         fin = False
         if jeux2.finJeux():
-            #print("fin du jeux")
+            # print("fin du jeux")
             gagnant = jeux2.gagnant()
             # if gagnant == 1:
             #     print(f"gagnant: joueur 1 : {listeCoups2}")
@@ -87,40 +87,22 @@ def jeux3():
 
     print("nb de jeux: ", len(games.games))
 
-    # while True:
-    #     liste_coups = jeux.cases_possibles()
-    #     n = random.randint(0, len(liste_coups) - 1)
-    #     pos = liste_coups[n]
-    #     jeux.joue(joueur, pos[0], pos[1])
-    #     jeux.afficher()
-    #
-    #     if jeux.finJeux():
-    #         print("fin du jeux")
-    #         gagnant = jeux.gagnant()
-    #         if gagnant == 1:
-    #             print("gagnant: joueur 1")
-    #         elif gagnant == 2:
-    #             print("gagnant: joueur 2")
-    #         else:
-    #             print("aucun gagnant")
-    #         break
-    #
-    #     if joueur == 1:
-    #         joueur = 2
-    #     else:
-    #         joueur = 1
 
+def jeux4():
+    games = Games()
+    joueur1 = JoueurAleatoire(games, 1)
+    #joueur2 = JoueurAleatoire(games, 2)
+    joueur2=JoueurSimple(games, 2)
+    partie = Partie(joueur1, joueur2)
+    partie.partie()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
     jeux()
     jeux2()
-    jeux3()
+    # jeux3()
+    jeux4()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -1,3 +1,5 @@
+import random
+from abc import ABC, abstractmethod
 from copy import deepcopy
 
 JOUEUR1 = -1
@@ -212,3 +214,72 @@ class Games():
 
     def __init__(self):
         self.games = []
+
+
+class JoueurAbstract(ABC):
+
+    def __init__(self, game, no_joueur):
+        self.game = game
+        self.no_joueur = no_joueur
+
+    @abstractmethod
+    def coup_suivant(self, jeux):
+        pass
+
+class JoueurAleatoire(JoueurAbstract):
+
+    def coup_suivant(self, jeux):
+        liste_coups=jeux.cases_possibles()
+        n = random.randint(0, len(liste_coups) - 1)
+        pos = liste_coups[n]
+        return pos
+
+class JoueurSimple(JoueurAbstract):
+
+    def coup_suivant(self, jeux):
+        liste_coups=jeux.cases_possibles()
+        pos = liste_coups[0]
+        return pos
+
+class Partie:
+
+    def __init__(self, joueur1, joueur2):
+        self.joueur1 = joueur1
+        self.joueur2 = joueur2
+
+    def partie(self):
+        jeux = TicTacToeGame()
+        joueur = 1
+        #games = Games()
+        gagnant=-1
+
+        while True:
+            pos=self.coup_suivant(jeux,joueur)
+            jeux.joue(joueur, pos[0], pos[1])
+            #jeux.afficher()
+
+            if jeux.finJeux():
+                gagnant = jeux.gagnant()
+                break
+
+            if joueur == 1:
+                joueur = 2
+            else:
+                joueur = 1
+
+        jeux.afficher()
+        #print("fin du jeux")
+        if gagnant == 1:
+            print("gagnant: joueur 1")
+        elif gagnant == 2:
+            print("gagnant: joueur 2")
+        else:
+            print("aucun gagnant")
+
+    def coup_suivant(self,jeux,joueur):
+        if joueur == 1:
+            return self.joueur1.coup_suivant(jeux)
+        elif joueur == 2:
+            return self.joueur2.coup_suivant(jeux)
+        else:
+            raise Exception(f"joueur invalide: {joueur}")

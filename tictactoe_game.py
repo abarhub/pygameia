@@ -10,9 +10,9 @@ class TicTacToeGame:
 
     def __init__(self, plateau=None):
         if plateau is None:
-            self.plateau = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            self.plateau:list[list[int]] = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         else:
-            self.plateau = deepcopy(plateau)
+            self.plateau:list[list[int]] = deepcopy(plateau)
 
     def afficher(self):
         s = ""
@@ -30,13 +30,13 @@ class TicTacToeGame:
         print("jeux:")
         print(s)
 
-    def valeurCase(self, x, y):
+    def valeurCase(self, x, y)->str:
         if x < 0 or x > 2 or y < 0 or y > 2:
             raise Exception(f"la position n'est pas valide: x={x}, y={y}")
         n = self.plateau[x][y]
         return self.valeurCase2(n)
 
-    def valeurCase2(self, n):
+    def valeurCase2(self, n)->str:
         if n == 0:
             return " "
         elif n == JOUEUR1:
@@ -59,7 +59,7 @@ class TicTacToeGame:
         elif noJoueur == 2:
             self.plateau[x][y] = 1
 
-    def finJeux(self):
+    def finJeux(self)-> bool:
 
         # for row in self.plateau:
         #     valeur = set()
@@ -108,7 +108,7 @@ class TicTacToeGame:
 
         return True
 
-    def cases_possibles(self):
+    def cases_possibles(self)->list[tuple[int, int]]:
 
         liste = []
 
@@ -191,10 +191,10 @@ class TicTacToeGame:
 
 
 class Coup:
-    def __init__(self, x, y, plateau):
-        self.x = x
-        self.y = y
-        self.plateau = plateau
+    def __init__(self, x:int, y:int, plateau:list[list[int]]) -> None:
+        self.x:int = x
+        self.y:int = y
+        self.plateau:list[list[int]] = plateau
 
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
@@ -204,31 +204,31 @@ class Coup:
 
 
 class Game:
-    def __init__(self, noJoueurGagnant, listeCoups, plateau):
-        self.noJoueurGagnant = noJoueurGagnant
-        self.listeCoups = listeCoups
-        self.plateau = plateau
+    def __init__(self, noJoueurGagnant:int, listeCoups: list[Coup], plateau:list[list[int]]):
+        self.noJoueurGagnant:int = noJoueurGagnant
+        self.listeCoups: list[Coup] = listeCoups
+        self.plateau:list[list[int]] = plateau
 
 
-class Games():
+class Games:
 
     def __init__(self):
-        self.games = []
+        self.games :list[Game] = []
 
 
 class JoueurAbstract(ABC):
 
-    def __init__(self, game, no_joueur):
-        self.game = game
-        self.no_joueur = no_joueur
+    def __init__(self, game: Games, no_joueur:int):
+        self.game:Games = game
+        self.no_joueur:int = no_joueur
 
     @abstractmethod
-    def coup_suivant(self, jeux):
+    def coup_suivant(self, jeux)-> tuple[int, int]:
         pass
 
 class JoueurAleatoire(JoueurAbstract):
 
-    def coup_suivant(self, jeux):
+    def coup_suivant(self, jeux)-> tuple[int, int]:
         liste_coups=jeux.cases_possibles()
         n = random.randint(0, len(liste_coups) - 1)
         pos = liste_coups[n]
@@ -236,22 +236,51 @@ class JoueurAleatoire(JoueurAbstract):
 
 class JoueurSimple(JoueurAbstract):
 
-    def coup_suivant(self, jeux):
+    def coup_suivant(self, jeux)-> tuple[int, int]:
         liste_coups=jeux.cases_possibles()
         pos = liste_coups[0]
         return pos
 
+
+
+
+
+class JoueurMinMax(JoueurAbstract):
+    def __init__(self, games: Games, no_joueur: int):
+        super().__init__(games, no_joueur)
+        self.games :Games = games
+
+    def coup_suivant(self, jeux)-> tuple[int, int]:
+        liste_coups=jeux.cases_possibles()
+        tmp=self.trouve_coups(jeux)
+        return tmp[0]
+
+    def trouve_coups(self,jeux)-> list[tuple[int, int]]:
+        plateau=jeux.clone_plateau()
+        resultats=[]
+        for partie in self.games.games:
+            if True: #partie.plateau == plateau:
+                if partie.noJoueurGagnant == self.no_joueur:
+                    # return tmp.
+                    #tmp=(partie)
+                    for coup in partie.listeCoups:
+                        if coup.plateau == plateau:
+                            case=(coup.x, coup.y)
+                            resultats.append(case)
+
+        return resultats
+
 class Partie:
 
-    def __init__(self, joueur1, joueur2):
-        self.joueur1 = joueur1
-        self.joueur2 = joueur2
+    def __init__(self, joueur1: JoueurAbstract, joueur2: JoueurAbstract):
+        self.joueur1: JoueurAbstract = joueur1
+        self.joueur2: JoueurAbstract = joueur2
 
     def partie(self):
         jeux = TicTacToeGame()
-        joueur = 1
+        joueur: int = 1
         #games = Games()
-        gagnant=-1
+        gagnant: int=-1
 
         while True:
             pos=self.coup_suivant(jeux,joueur)
@@ -275,6 +304,7 @@ class Partie:
             print("gagnant: joueur 2")
         else:
             print("aucun gagnant")
+        return gagnant
 
     def coup_suivant(self,jeux,joueur):
         if joueur == 1:

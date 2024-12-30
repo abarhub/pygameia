@@ -89,12 +89,29 @@ def jeux3():
 
 
 def jeux4():
-    games = Games()
-    joueur1 = JoueurAleatoire(games, 1)
-    #joueur2 = JoueurAleatoire(games, 2)
-    joueur2=JoueurSimple(games, 2)
-    partie = Partie(joueur1, joueur2)
-    partie.partie()
+    nb_test=1
+    resultats={1:0, 2:0, 0:0}
+
+    games0 = Games()
+    jeux = TicTacToeGame()
+    joueur = 1
+    coup_suivant(joueur, jeux, [], games0)
+
+    for i in range(nb_test):
+        games = Games()
+        joueur1 = JoueurAleatoire(games, 1)
+        #joueur2 = JoueurAleatoire(games, 2)
+        joueur2=JoueurSimple(games, 2)
+        partie = Partie(joueur1, joueur2)
+        res=partie.partie()
+        if res == 1:
+            resultats[1] += 1
+        elif res == 2:
+            resultats[2] += 1
+        else:
+            resultats[0] += 1
+
+    print("resultat: ", resultats)
 
 
 

@@ -261,17 +261,17 @@ class JoueurMinMax(JoueurAbstract):
         resultats_gagnant = []
         resultats_null = []
         for partie in self.games.games:
-            if True:  # partie.plateau == plateau:
+            if True:
                 if partie.noJoueurGagnant == self.no_joueur:
-                    # return tmp.
-                    # tmp=(partie)
+                    pos=0
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
                             case = (coup.x, coup.y)
+                            if pos==len(partie.listeCoups)-1:
+                                return case
                             resultats_gagnant.append(case)
+                        pos += 1
                 elif partie.noJoueurGagnant == 0:
-                    # return tmp.
-                    # tmp=(partie)
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
                             case = (coup.x, coup.y)

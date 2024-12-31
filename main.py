@@ -4,7 +4,7 @@ import time
 from copy import deepcopy
 
 from tictactoe_game import TicTacToeGame, Games, Game, Coup, Partie, JoueurAleatoire, JoueurSimple, JoueurMinMax, \
-    SerialisationGame, JoueurMinMax2
+    SerialisationGame, JoueurMinMax2, JoueurMinMax3
 
 
 # Press Maj+F10 to execute it or replace it with your code.
@@ -90,7 +90,7 @@ def jeux3():
 
 
 def jeux4():
-    nb_test=50
+    nb_test=1
     resultats={1:0, 2:0, 0:0}
 
     print("calcul des coups ...")
@@ -110,7 +110,8 @@ def jeux4():
         #joueur2 = JoueurAleatoire(games, 2)
         # joueur2=JoueurSimple(games, 2)
         #joueur2 = JoueurMinMax(games0, 2)
-        joueur2 = JoueurMinMax2(games0, 2)
+        #joueur2 = JoueurMinMax2(games0, 2)
+        joueur2 = JoueurMinMax3(games0, 2)
         partie = Partie(joueur1, joueur2)
         res=partie.partie()
         if res == 1:

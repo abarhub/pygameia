@@ -302,7 +302,7 @@ class JoueurMinMax2(JoueurAbstract):
         resultats = self.trouve_coups2(plateau)
 
         premier_gagnant = None
-        premier_null=None
+        premier_null = None
         for coup in resultats:
             game = coup[0]
             pos = coup[1]
@@ -346,6 +346,123 @@ class JoueurMinMax2(JoueurAbstract):
                 pos += 1
 
         return liste2
+
+
+class JoueurMinMax3(JoueurAbstract):
+    def __init__(self, games: Games, no_joueur: int, profondeur: int = 2):
+        super().__init__(games, no_joueur)
+        self.games: Games = games
+        self.profondeur = profondeur
+
+    def coup_suivant(self, jeux) -> tuple[int, int]:
+        tmp = self.trouve_coups(jeux)
+        return tmp
+
+    def trouve_coups(self, jeux) -> tuple[int, int]:
+        # plateau = jeux.clone_plateau()
+        no_joueur = self.no_joueur
+        liste_cases = jeux.cases_possibles()
+        liste_coups = []
+        for coup in liste_cases:
+            jeux2 = TicTacToeGame(jeux.clone_plateau())
+            jeux2.joue(no_joueur, coup[0], coup[1])
+            score = self.parcourt(jeux2, self.no_joueur, self.profondeur, True)
+            liste_coups.append((coup[0], coup[1], score))
+
+        score_max = None
+        resultat = None
+        for coup in liste_coups:
+            if score_max is None or coup[2] > score_max:
+                score_max = coup[2]
+                resultat = (coup[0], coup[1])
+
+        return resultat
+
+    def parcourt(self, jeux: TicTacToeGame, no_joueur: int, niveaux: int, maxScore: bool) -> int:
+        jeux2 = TicTacToeGame(jeux.clone_plateau())
+        # no_joueur = no_joueur
+        liste_cases = jeux2.cases_possibles()
+
+        liste_score: list[int] = []
+        for coup in liste_cases:
+            jeux3 = TicTacToeGame(jeux2.clone_plateau())
+            jeux3.joue(no_joueur, coup[0], coup[1])
+            if niveaux <= 1:
+                score = self.calcul_score(jeux3, no_joueur)
+                liste_score.append(score)
+            else:
+                no_joueur_suivant: int = 0
+                if no_joueur == 1:
+                    no_joueur_suivant = 2
+                elif no_joueur == 2:
+                    no_joueur_suivant = 1
+                score = self.parcourt(jeux3, no_joueur_suivant, niveaux - 1, not maxScore)
+                liste_score.append(score)
+
+        if len(liste_score) == 0:
+            return 0
+        elif maxScore:
+            return max(liste_score)
+        else:
+            return min(liste_score)
+
+    def calcul_score(self, game: TicTacToeGame, no_joueur: int) -> int:
+        game_score = 0
+        for ligne in range(len(game.plateau)):
+            for colonne in range(len(game.plateau[ligne])):
+                value = game.plateau[ligne][colonne]
+                if value == 0:
+                    nb_joueur1 = 0
+                    nb_joueur2 = 0
+                    for n in range(len(game.plateau[ligne])):
+                        if game.plateau[ligne][n] == JOUEUR1:
+                            nb_joueur1 += 1
+                        elif game.plateau[ligne][n] == JOUEUR2:
+                            nb_joueur2 += 1
+                    if nb_joueur1 == 2:
+                        game_score += 1
+                    elif nb_joueur2 == 2:
+                        game_score += 1
+
+                    nb_joueur1 = 0
+                    nb_joueur2 = 0
+                    for n in range(len(game.plateau)):
+                        if game.plateau[n][colonne] == JOUEUR1:
+                            nb_joueur1 += 1
+                        elif game.plateau[n][colonne] == JOUEUR2:
+                            nb_joueur2 += 1
+                    if nb_joueur1 == 2:
+                        game_score += 1
+                    elif nb_joueur2 == 2:
+                        game_score += 1
+
+                    if ligne == colonne:
+                        nb_joueur1 = 0
+                        nb_joueur2 = 0
+                        for n in range(len(game.plateau)):
+                            if game.plateau[n][n] == JOUEUR1:
+                                nb_joueur1 += 1
+                            elif game.plateau[n][n] == JOUEUR2:
+                                nb_joueur2 += 1
+                        if nb_joueur1 == 2:
+                            game_score += 1
+                        elif nb_joueur2 == 2:
+                            game_score += 1
+
+                    if ligne + colonne == 2:
+                        nb_joueur1 = 0
+                        nb_joueur2 = 0
+                        for n in range(len(game.plateau)):
+                            if game.plateau[2-n][n] == JOUEUR1:
+                                nb_joueur1 += 1
+                            elif game.plateau[2-n][n] == JOUEUR2:
+                                nb_joueur2 += 1
+                        if nb_joueur1 == 2:
+                            game_score += 1
+                        elif nb_joueur2 == 2:
+                            game_score += 1
+
+        return game_score
 
 
 class Partie:

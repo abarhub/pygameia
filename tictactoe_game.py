@@ -189,7 +189,7 @@ class TicTacToeGame:
 
         return 0
 
-    def clone_plateau(self):
+    def clone_plateau(self)->list[list[int]]:
         return deepcopy(self.plateau)
 
 
@@ -284,6 +284,56 @@ class JoueurMinMax(JoueurAbstract):
         else:
             liste_coups = jeux.cases_possibles()
             return liste_coups[0]
+
+
+class JoueurMinMax2(JoueurAbstract):
+    def __init__(self, games: Games, no_joueur: int):
+        super().__init__(games, no_joueur)
+        self.games: Games = games
+
+    def coup_suivant(self, jeux) -> tuple[int, int]:
+        tmp = self.trouve_coups(jeux)
+        return tmp
+
+    def trouve_coups(self, jeux) -> tuple[int, int]:
+        plateau = jeux.clone_plateau()
+        resultats_gagnant = []
+        resultats_null = []
+        resultats=self.trouve_coups2(plateau)
+
+        premier_gagnant=None
+        for coup in resultats:
+            game=coup[0]
+            pos=coup[1]
+            if game.noJoueurGagnant == self.no_joueur and pos==len(game.listeCoups)-1:
+                tmp= game.listeCoups[pos]
+                return tmp.x, tmp.y
+            if premier_gagnant==None:
+                tmp = game.listeCoups[pos]
+                premier_gagnant=(tmp.x, tmp.y)
+
+        if premier_gagnant!=None:
+            return premier_gagnant
+
+        for coup in resultats:
+            if coup[0].noJoueurGagnant == 0:
+                tmp= coup[0].listeCoups[coup[1]]
+                return tmp.x, tmp.y
+
+        res=resultats[0]
+        tmp = res[0].listeCoups[res[1]]
+        return tmp.x, tmp.y
+
+    def trouve_coups2(self,plateau:list[list[int]])->list[tuple[Game, int]]:
+        liste2:list[tuple[Game, int]]=[]
+        for partie in self.games.games:
+            pos = 0
+            for coup in partie.listeCoups:
+                if coup.plateau == plateau:
+                    liste2.append((partie,pos))
+                pos += 1
+
+        return liste2
 
 
 class Partie:

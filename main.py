@@ -90,7 +90,7 @@ def jeux3():
 
 
 def jeux4():
-    nb_test=1
+    nb_test=50
     resultats={1:0, 2:0, 0:0}
 
     print("calcul des coups ...")

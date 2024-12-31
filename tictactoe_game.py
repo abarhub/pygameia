@@ -189,7 +189,7 @@ class TicTacToeGame:
 
         return 0
 
-    def clone_plateau(self)->list[list[int]]:
+    def clone_plateau(self) -> list[list[int]]:
         return deepcopy(self.plateau)
 
 
@@ -263,11 +263,11 @@ class JoueurMinMax(JoueurAbstract):
         for partie in self.games.games:
             if True:
                 if partie.noJoueurGagnant == self.no_joueur:
-                    pos=0
+                    pos = 0
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
                             case = (coup.x, coup.y)
-                            if pos==len(partie.listeCoups)-1:
+                            if pos == len(partie.listeCoups) - 1:
                                 return case
                             resultats_gagnant.append(case)
                         pos += 1
@@ -297,40 +297,52 @@ class JoueurMinMax2(JoueurAbstract):
 
     def trouve_coups(self, jeux) -> tuple[int, int]:
         plateau = jeux.clone_plateau()
-        resultats_gagnant = []
-        resultats_null = []
-        resultats=self.trouve_coups2(plateau)
+        # resultats_gagnant = []
+        # resultats_null = []
+        resultats = self.trouve_coups2(plateau)
 
-        premier_gagnant=None
+        premier_gagnant = None
+        premier_null=None
         for coup in resultats:
-            game=coup[0]
-            pos=coup[1]
-            if game.noJoueurGagnant == self.no_joueur and pos==len(game.listeCoups)-1:
-                tmp= game.listeCoups[pos]
-                return tmp.x, tmp.y
-            if premier_gagnant==None:
-                tmp = game.listeCoups[pos]
-                premier_gagnant=(tmp.x, tmp.y)
+            game = coup[0]
+            pos = coup[1]
+            if game.noJoueurGagnant == self.no_joueur:
+                if pos == len(game.listeCoups) - 1:
+                    tmp = game.listeCoups[pos]
+                    return tmp.x, tmp.y
+                if premier_gagnant is None:
+                    tmp = game.listeCoups[pos]
+                    premier_gagnant = (tmp.x, tmp.y)
+            elif game.noJoueurGagnant == 0:
+                if premier_null is None:
+                    tmp = game.listeCoups[pos]
+                    premier_null = (tmp.x, tmp.y)
+            else:
+                if pos == len(game.listeCoups) - 1:
+                    tmp = game.listeCoups[pos]
+                    return tmp.x, tmp.y
 
-        if premier_gagnant!=None:
+        if premier_gagnant is not None:
             return premier_gagnant
+        elif premier_null is not None:
+            return premier_null
 
-        for coup in resultats:
-            if coup[0].noJoueurGagnant == 0:
-                tmp= coup[0].listeCoups[coup[1]]
-                return tmp.x, tmp.y
+        # for coup in resultats:
+        #     if coup[0].noJoueurGagnant == 0:
+        #         tmp = coup[0].listeCoups[coup[1]]
+        #         return tmp.x, tmp.y
 
-        res=resultats[0]
+        res = resultats[0]
         tmp = res[0].listeCoups[res[1]]
         return tmp.x, tmp.y
 
-    def trouve_coups2(self,plateau:list[list[int]])->list[tuple[Game, int]]:
-        liste2:list[tuple[Game, int]]=[]
+    def trouve_coups2(self, plateau: list[list[int]]) -> list[tuple[Game, int]]:
+        liste2: list[tuple[Game, int]] = []
         for partie in self.games.games:
             pos = 0
             for coup in partie.listeCoups:
                 if coup.plateau == plateau:
-                    liste2.append((partie,pos))
+                    liste2.append((partie, pos))
                 pos += 1
 
         return liste2
@@ -347,10 +359,12 @@ class Partie:
         joueur: int = 1
         # games = Games()
         gagnant: int = -1
+        liste_coups = []
 
         while True:
             pos = self.coup_suivant(jeux, joueur)
             jeux.joue(joueur, pos[0], pos[1])
+            liste_coups.append((joueur, pos[0], pos[1]))
             # jeux.afficher()
 
             if jeux.finJeux():
@@ -363,6 +377,7 @@ class Partie:
                 joueur = 1
 
         jeux.afficher()
+        print(f"liste des coups: {liste_coups}")
         # print("fin du jeux")
         if gagnant == 1:
             print("gagnant: joueur 1")
@@ -411,7 +426,7 @@ class SerialisationGame:
             self.serialise(games0)
             return games0
 
-    def coup_suivant(self,joueur, jeux, listeCoups, games):
+    def coup_suivant(self, joueur, jeux, listeCoups, games):
         liste_coups = jeux.cases_possibles()
 
         for coup in liste_coups:

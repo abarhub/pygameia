@@ -397,6 +397,8 @@ class JoueurMinMax3(JoueurAbstract):
                 elif no_joueur == 2:
                     no_joueur_suivant = 1
                 score = self.parcourt(jeux3, no_joueur_suivant, niveaux - 1, not maxScore)
+                if not maxScore:
+                    score = -score
                 liste_score.append(score)
 
         if len(liste_score) == 0:
@@ -408,59 +410,138 @@ class JoueurMinMax3(JoueurAbstract):
 
     def calcul_score(self, game: TicTacToeGame, no_joueur: int) -> int:
         game_score = 0
+        ajout_double=1
+        ajout_triple=2
         for ligne in range(len(game.plateau)):
-            for colonne in range(len(game.plateau[ligne])):
-                value = game.plateau[ligne][colonne]
-                if value == 0:
-                    nb_joueur1 = 0
-                    nb_joueur2 = 0
-                    for n in range(len(game.plateau[ligne])):
-                        if game.plateau[ligne][n] == JOUEUR1:
-                            nb_joueur1 += 1
-                        elif game.plateau[ligne][n] == JOUEUR2:
-                            nb_joueur2 += 1
-                    if nb_joueur1 == 2:
-                        game_score += 1
-                    elif nb_joueur2 == 2:
-                        game_score += 1
 
-                    nb_joueur1 = 0
-                    nb_joueur2 = 0
-                    for n in range(len(game.plateau)):
-                        if game.plateau[n][colonne] == JOUEUR1:
-                            nb_joueur1 += 1
-                        elif game.plateau[n][colonne] == JOUEUR2:
-                            nb_joueur2 += 1
-                    if nb_joueur1 == 2:
-                        game_score += 1
-                    elif nb_joueur2 == 2:
-                        game_score += 1
+            if no_joueur == 1:
+                nb_joueur1 = len([x for x in game.plateau[ligne] if x == JOUEUR1])
+                if nb_joueur1 == 2:
+                    game_score += ajout_double
+                elif nb_joueur1 == 3:
+                    game_score += ajout_triple
+            elif no_joueur == 2:
+                nb_joueur2 = len([x for x in game.plateau[ligne] if x == JOUEUR2])
+                if nb_joueur2 == 2:
+                    game_score += ajout_double
+                elif nb_joueur2 == 3:
+                    game_score += ajout_triple
 
-                    if ligne == colonne:
-                        nb_joueur1 = 0
-                        nb_joueur2 = 0
-                        for n in range(len(game.plateau)):
-                            if game.plateau[n][n] == JOUEUR1:
-                                nb_joueur1 += 1
-                            elif game.plateau[n][n] == JOUEUR2:
-                                nb_joueur2 += 1
-                        if nb_joueur1 == 2:
-                            game_score += 1
-                        elif nb_joueur2 == 2:
-                            game_score += 1
+            # for colonne in range(len(game.plateau[ligne])):
+            #     value = game.plateau[ligne][colonne]
+            #
+            #     if value == 0:
+            #         nb_joueur1 = 0
+            #         nb_joueur2 = 0
+            #         for n in range(len(game.plateau[ligne])):
+            #             if game.plateau[ligne][n] == JOUEUR1:
+            #                 nb_joueur1 += 1
+            #             elif game.plateau[ligne][n] == JOUEUR2:
+            #                 nb_joueur2 += 1
+            #         if no_joueur==1:
+            #             if nb_joueur1 == 2:
+            #                 game_score += 1
+            #             elif nb_joueur1 == 3:
+            #                 game_score += 2
+            #         elif no_joueur==2:
+            #             if nb_joueur2 == 2:
+            #                  game_score += 1
+            #             elif nb_joueur2 == 3:
+            #                 game_score += 2
+            #
+            #         nb_joueur1 = 0
+            #         nb_joueur2 = 0
+            #         for n in range(len(game.plateau)):
+            #             if game.plateau[n][colonne] == JOUEUR1:
+            #                 nb_joueur1 += 1
+            #             elif game.plateau[n][colonne] == JOUEUR2:
+            #                 nb_joueur2 += 1
+            #         if nb_joueur1 == 2:
+            #             game_score += 1
+            #         elif nb_joueur2 == 2:
+            #             game_score += 1
+            #
+            #         if ligne == colonne:
+            #             nb_joueur1 = 0
+            #             nb_joueur2 = 0
+            #             for n in range(len(game.plateau)):
+            #                 if game.plateau[n][n] == JOUEUR1:
+            #                     nb_joueur1 += 1
+            #                 elif game.plateau[n][n] == JOUEUR2:
+            #                     nb_joueur2 += 1
+            #             if nb_joueur1 == 2:
+            #                 game_score += 1
+            #             elif nb_joueur2 == 2:
+            #                 game_score += 1
+            #
+            #         if ligne + colonne == 2:
+            #             nb_joueur1 = 0
+            #             nb_joueur2 = 0
+            #             for n in range(len(game.plateau)):
+            #                 if game.plateau[2-n][n] == JOUEUR1:
+            #                     nb_joueur1 += 1
+            #                 elif game.plateau[2-n][n] == JOUEUR2:
+            #                     nb_joueur2 += 1
+            #             if nb_joueur1 == 2:
+            #                 game_score += 1
+            #             elif nb_joueur2 == 2:
+            #                 game_score += 1
 
-                    if ligne + colonne == 2:
-                        nb_joueur1 = 0
-                        nb_joueur2 = 0
-                        for n in range(len(game.plateau)):
-                            if game.plateau[2-n][n] == JOUEUR1:
-                                nb_joueur1 += 1
-                            elif game.plateau[2-n][n] == JOUEUR2:
-                                nb_joueur2 += 1
-                        if nb_joueur1 == 2:
-                            game_score += 1
-                        elif nb_joueur2 == 2:
-                            game_score += 1
+        for colonne in range(len(game.plateau)):
+            nb_joueur1 = 0
+            nb_joueur2 = 0
+            for n in range(len(game.plateau)):
+                if game.plateau[n][colonne] == JOUEUR1:
+                    nb_joueur1 += 1
+                elif game.plateau[n][colonne] == JOUEUR2:
+                    nb_joueur2 += 1
+            if no_joueur == 1:
+                if nb_joueur1 == 2:
+                    game_score += ajout_double
+                elif nb_joueur1 == 3:
+                    game_score += ajout_triple
+            elif no_joueur == 2:
+                if nb_joueur2 == 2:
+                    game_score += ajout_double
+                elif nb_joueur2 == 3:
+                    game_score += ajout_triple
+
+        nb_joueur1 = 0
+        nb_joueur2 = 0
+        for n in range(len(game.plateau)):
+            if game.plateau[n][n] == JOUEUR1:
+                nb_joueur1 += 1
+            elif game.plateau[n][n] == JOUEUR2:
+                nb_joueur2 += 1
+        if no_joueur == 1:
+            if nb_joueur1 == 2:
+                game_score += ajout_double
+            elif nb_joueur1 == 3:
+                game_score += ajout_triple
+        elif no_joueur == 2:
+            if nb_joueur2 == 2:
+                game_score += ajout_double
+            elif nb_joueur2 == 3:
+                game_score += ajout_triple
+
+        # if ligne + colonne == 2:
+        nb_joueur1 = 0
+        nb_joueur2 = 0
+        for n in range(len(game.plateau)):
+            if game.plateau[2 - n][n] == JOUEUR1:
+                nb_joueur1 += 1
+            elif game.plateau[2 - n][n] == JOUEUR2:
+                nb_joueur2 += 1
+        if no_joueur == 1:
+            if nb_joueur1 == 2:
+                game_score += ajout_double
+            elif nb_joueur1 == 3:
+                game_score += ajout_triple
+        elif no_joueur == 2:
+            if nb_joueur2 == 2:
+                game_score += ajout_double
+            elif nb_joueur2 == 3:
+                game_score += ajout_triple
 
         return game_score
 

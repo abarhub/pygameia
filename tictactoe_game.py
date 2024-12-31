@@ -251,13 +251,20 @@ class JoueurMinMax(JoueurAbstract):
         self.games :Games = games
 
     def coup_suivant(self, jeux)-> tuple[int, int]:
-        liste_coups=jeux.cases_possibles()
+        #liste_coups=jeux.cases_possibles()
         tmp=self.trouve_coups(jeux)
-        return tmp[0]
+        if len(tmp[0])>0:
+            return tmp[0][0]
+        elif len(tmp[1])>0:
+            return tmp[1][0]
+        else:
+            liste_coups = jeux.cases_possibles()
+            return liste_coups[0]
 
-    def trouve_coups(self,jeux)-> list[tuple[int, int]]:
+    def trouve_coups(self,jeux)-> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
         plateau=jeux.clone_plateau()
-        resultats=[]
+        resultats_gagnant=[]
+        resultats_null = []
         for partie in self.games.games:
             if True: #partie.plateau == plateau:
                 if partie.noJoueurGagnant == self.no_joueur:
@@ -266,9 +273,16 @@ class JoueurMinMax(JoueurAbstract):
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
                             case=(coup.x, coup.y)
-                            resultats.append(case)
+                            resultats_gagnant.append(case)
+                elif partie.noJoueurGagnant == 0:
+                    # return tmp.
+                    #tmp=(partie)
+                    for coup in partie.listeCoups:
+                        if coup.plateau == plateau:
+                            case=(coup.x, coup.y)
+                            resultats_null.append(case)
 
-        return resultats
+        return (resultats_gagnant,resultats_null)
 
 class Partie:
 

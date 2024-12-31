@@ -3,7 +3,8 @@ import random
 import time
 from copy import deepcopy
 
-from tictactoe_game import TicTacToeGame, Games, Game, Coup, Partie, JoueurAleatoire, JoueurSimple, JoueurMinMax
+from tictactoe_game import TicTacToeGame, Games, Game, Coup, Partie, JoueurAleatoire, JoueurSimple, JoueurMinMax, \
+    SerialisationGame
 
 
 # Press Maj+F10 to execute it or replace it with your code.
@@ -93,12 +94,14 @@ def jeux4():
     resultats={1:0, 2:0, 0:0}
 
     print("calcul des coups ...")
-    games0 = Games()
-    jeux = TicTacToeGame()
-    joueur = 1
-    start = time.time()
-    coup_suivant(joueur, jeux, [], games0)
-    print("duree:", time.ctime(time.time() - start)[11:19], " sec")
+    serial=SerialisationGame()
+    games0=serial.getGames()
+    # games0 = Games()
+    # jeux = TicTacToeGame()
+    # joueur = 1
+    # start = time.time()
+    # coup_suivant(joueur, jeux, [], games0)
+    # print("duree:", time.ctime(time.time() - start)[11:19], " sec")
 
     print("debut partie ...")
     for i in range(nb_test):

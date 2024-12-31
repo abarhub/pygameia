@@ -1,6 +1,9 @@
+import pickle
 import random
+import time
 from abc import ABC, abstractmethod
 from copy import deepcopy
+from pathlib import Path
 
 JOUEUR1 = -1
 JOUEUR2 = 1
@@ -10,9 +13,9 @@ class TicTacToeGame:
 
     def __init__(self, plateau=None):
         if plateau is None:
-            self.plateau:list[list[int]] = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            self.plateau: list[list[int]] = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         else:
-            self.plateau:list[list[int]] = deepcopy(plateau)
+            self.plateau: list[list[int]] = deepcopy(plateau)
 
     def afficher(self):
         s = ""
@@ -30,13 +33,13 @@ class TicTacToeGame:
         print("jeux:")
         print(s)
 
-    def valeurCase(self, x, y)->str:
+    def valeurCase(self, x, y) -> str:
         if x < 0 or x > 2 or y < 0 or y > 2:
             raise Exception(f"la position n'est pas valide: x={x}, y={y}")
         n = self.plateau[x][y]
         return self.valeurCase2(n)
 
-    def valeurCase2(self, n)->str:
+    def valeurCase2(self, n) -> str:
         if n == 0:
             return " "
         elif n == JOUEUR1:
@@ -59,7 +62,7 @@ class TicTacToeGame:
         elif noJoueur == 2:
             self.plateau[x][y] = 1
 
-    def finJeux(self)-> bool:
+    def finJeux(self) -> bool:
 
         # for row in self.plateau:
         #     valeur = set()
@@ -108,7 +111,7 @@ class TicTacToeGame:
 
         return True
 
-    def cases_possibles(self)->list[tuple[int, int]]:
+    def cases_possibles(self) -> list[tuple[int, int]]:
 
         liste = []
 
@@ -191,10 +194,10 @@ class TicTacToeGame:
 
 
 class Coup:
-    def __init__(self, x:int, y:int, plateau:list[list[int]]) -> None:
-        self.x:int = x
-        self.y:int = y
-        self.plateau:list[list[int]] = plateau
+    def __init__(self, x: int, y: int, plateau: list[list[int]]) -> None:
+        self.x: int = x
+        self.y: int = y
+        self.plateau: list[list[int]] = plateau
 
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
@@ -204,85 +207,85 @@ class Coup:
 
 
 class Game:
-    def __init__(self, noJoueurGagnant:int, listeCoups: list[Coup], plateau:list[list[int]]):
-        self.noJoueurGagnant:int = noJoueurGagnant
+    def __init__(self, noJoueurGagnant: int, listeCoups: list[Coup], plateau: list[list[int]]):
+        self.noJoueurGagnant: int = noJoueurGagnant
         self.listeCoups: list[Coup] = listeCoups
-        self.plateau:list[list[int]] = plateau
+        self.plateau: list[list[int]] = plateau
 
 
 class Games:
 
     def __init__(self):
-        self.games :list[Game] = []
+        self.games: list[Game] = []
 
 
 class JoueurAbstract(ABC):
 
-    def __init__(self, game: Games, no_joueur:int):
-        self.game:Games = game
-        self.no_joueur:int = no_joueur
+    def __init__(self, game: Games, no_joueur: int):
+        self.game: Games = game
+        self.no_joueur: int = no_joueur
 
     @abstractmethod
-    def coup_suivant(self, jeux)-> tuple[int, int]:
+    def coup_suivant(self, jeux) -> tuple[int, int]:
         pass
+
 
 class JoueurAleatoire(JoueurAbstract):
 
-    def coup_suivant(self, jeux)-> tuple[int, int]:
-        liste_coups=jeux.cases_possibles()
+    def coup_suivant(self, jeux) -> tuple[int, int]:
+        liste_coups = jeux.cases_possibles()
         n = random.randint(0, len(liste_coups) - 1)
         pos = liste_coups[n]
         return pos
 
+
 class JoueurSimple(JoueurAbstract):
 
-    def coup_suivant(self, jeux)-> tuple[int, int]:
-        liste_coups=jeux.cases_possibles()
+    def coup_suivant(self, jeux) -> tuple[int, int]:
+        liste_coups = jeux.cases_possibles()
         pos = liste_coups[0]
         return pos
-
-
-
 
 
 class JoueurMinMax(JoueurAbstract):
     def __init__(self, games: Games, no_joueur: int):
         super().__init__(games, no_joueur)
-        self.games :Games = games
+        self.games: Games = games
 
-    def coup_suivant(self, jeux)-> tuple[int, int]:
-        #liste_coups=jeux.cases_possibles()
-        tmp=self.trouve_coups(jeux)
-        if len(tmp[0])>0:
+    def coup_suivant(self, jeux) -> tuple[int, int]:
+        # liste_coups=jeux.cases_possibles()
+        tmp = self.trouve_coups(jeux)
+        if len(tmp[0]) > 0:
             return tmp[0][0]
-        elif len(tmp[1])>0:
+        elif len(tmp[1]) > 0:
             return tmp[1][0]
         else:
             liste_coups = jeux.cases_possibles()
             return liste_coups[0]
 
-    def trouve_coups(self,jeux)-> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-        plateau=jeux.clone_plateau()
-        resultats_gagnant=[]
+    def trouve_coups(self, jeux) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+        plateau = jeux.clone_plateau()
+        resultats_gagnant = []
         resultats_null = []
         for partie in self.games.games:
-            if True: #partie.plateau == plateau:
+            if True:  # partie.plateau == plateau:
                 if partie.noJoueurGagnant == self.no_joueur:
                     # return tmp.
-                    #tmp=(partie)
+                    # tmp=(partie)
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
-                            case=(coup.x, coup.y)
+                            case = (coup.x, coup.y)
                             resultats_gagnant.append(case)
                 elif partie.noJoueurGagnant == 0:
                     # return tmp.
-                    #tmp=(partie)
+                    # tmp=(partie)
                     for coup in partie.listeCoups:
                         if coup.plateau == plateau:
-                            case=(coup.x, coup.y)
+                            case = (coup.x, coup.y)
                             resultats_null.append(case)
 
-        return (resultats_gagnant,resultats_null)
+        return (resultats_gagnant, resultats_null)
+
 
 class Partie:
 
@@ -293,13 +296,13 @@ class Partie:
     def partie(self):
         jeux = TicTacToeGame()
         joueur: int = 1
-        #games = Games()
-        gagnant: int=-1
+        # games = Games()
+        gagnant: int = -1
 
         while True:
-            pos=self.coup_suivant(jeux,joueur)
+            pos = self.coup_suivant(jeux, joueur)
             jeux.joue(joueur, pos[0], pos[1])
-            #jeux.afficher()
+            # jeux.afficher()
 
             if jeux.finJeux():
                 gagnant = jeux.gagnant()
@@ -311,7 +314,7 @@ class Partie:
                 joueur = 1
 
         jeux.afficher()
-        #print("fin du jeux")
+        # print("fin du jeux")
         if gagnant == 1:
             print("gagnant: joueur 1")
         elif gagnant == 2:
@@ -320,10 +323,69 @@ class Partie:
             print("aucun gagnant")
         return gagnant
 
-    def coup_suivant(self,jeux,joueur):
+    def coup_suivant(self, jeux, joueur):
         if joueur == 1:
             return self.joueur1.coup_suivant(jeux)
         elif joueur == 2:
             return self.joueur2.coup_suivant(jeux)
         else:
             raise Exception(f"joueur invalide: {joueur}")
+
+
+class SerialisationGame:
+    filename: str = "data/games.pickle"
+
+    def serialise(self, games: Games):
+        with open(self.filename, "wb") as outfile:
+            # "wb" argument opens the file in binary mode
+            pickle.dump(games, outfile)
+
+    def deserialise(self) -> Games:
+        with open(self.filename, "rb") as infile:
+            games = pickle.load(infile)
+            return games
+
+    def getGames(self) -> Games:
+        my_file = Path(self.filename)
+        if my_file.is_file():
+            print("recuperation des coups sur le fs ...")
+            games = self.deserialise()
+            return games
+        else:
+            print("calcul des coups ...")
+            games0 = Games()
+            jeux = TicTacToeGame()
+            joueur = 1
+            start = time.time()
+            self.coup_suivant(joueur, jeux, [], games0)
+            print("duree:", time.ctime(time.time() - start)[11:19], " sec")
+            self.serialise(games0)
+            return games0
+
+    def coup_suivant(self,joueur, jeux, listeCoups, games):
+        liste_coups = jeux.cases_possibles()
+
+        for coup in liste_coups:
+            jeux2 = TicTacToeGame(jeux.clone_plateau())
+            listeCoups2 = deepcopy(listeCoups)
+            listeCoups2.append(Coup(coup[0], coup[1], jeux2.clone_plateau()))
+            jeux2.joue(joueur, coup[0], coup[1])
+            fin = False
+            if jeux2.finJeux():
+                # print("fin du jeux")
+                gagnant = jeux2.gagnant()
+                # if gagnant == 1:
+                #     print(f"gagnant: joueur 1 : {listeCoups2}")
+                # elif gagnant == 2:
+                #     print(f"gagnant: joueur 2 : {listeCoups2}")
+                # else:
+                #     print(f"aucun gagnant : {listeCoups2}")
+                fin = True
+                game = Game(gagnant, listeCoups2, jeux2.clone_plateau())
+                games.games.append(game)
+            else:
+                if joueur == 1:
+                    joueur_suivant = 2
+                else:
+                    joueur_suivant = 1
+                self.coup_suivant(joueur_suivant, jeux2, listeCoups2, games)

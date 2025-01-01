@@ -157,11 +157,7 @@ class MyTestCase(unittest.TestCase):
 
 
     def test7(self):
-        jeux = TicTacToeGame()
-        jeux.joue(1, 0, 1)
-        jeux.joue(2, 0, 0)
-        jeux.joue(1, 2, 1)
-        #jeux.joue(2, 1, 2)
+        jeux=self.initialise_jeux(liste_coups=[(0,1),(0,0),(2,1)])
         jeux.afficher()
         games = Games()
         joueur2 = JoueurMinMax3(games, 2)
@@ -170,6 +166,35 @@ class MyTestCase(unittest.TestCase):
         tmp=joueur2.trouve_coups(jeux)
         print(tmp)
         self.assertEqual((1,1), tmp)
+
+    def test8(self):
+        #jeux=TicTacToeGame()
+        param_list=[
+            ([(0,1),(0,0),(2,1)],2,(1,1),"test1"),
+            #([(1, 2, 0), (2, 0, 0), (1, 1, 2), (2, 0, 1), (1, 0, 2), (2, 1, 0), (1, 2, 1)], 2, (1, 1), "test2"),
+        ]
+        for (liste_coups, no_joueur,pos, msg_test) in param_list:
+            with self.subTest(msg=f"test {msg_test}",param=[liste_coups, no_joueur,pos]):
+                jeux = self.initialise_jeux(liste_coups=liste_coups)
+                jeux.afficher()
+                games = Games()
+                joueur = JoueurMinMax3(games, no_joueur)
+                case_choisie=joueur.trouve_coups(jeux)
+                self.assertEqual(pos, case_choisie, msg=f"jeux {msg_test}:\n{jeux.to_string()}\npos:{pos}\ncase_choisie:{case_choisie}")
+
+    def initialise_jeux(self, liste_coups=None) -> TicTacToeGame:
+        if liste_coups is None:
+            liste_coups = []
+        jeux = TicTacToeGame()
+        no_joueur=1
+        for coup in liste_coups:
+            jeux.joue(no_joueur, coup[0], coup[1])
+            if no_joueur==1:
+                no_joueur=2
+            else:
+                no_joueur=1
+
+        return jeux
 
 
 if __name__ == '__main__':

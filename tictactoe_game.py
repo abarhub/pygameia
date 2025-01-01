@@ -18,6 +18,21 @@ class TicTacToeGame:
             self.plateau: list[list[int]] = deepcopy(plateau)
 
     def afficher(self):
+        s = self.to_string()
+        # for row in self.plateau:
+        #     s += "|"
+        #     for col in row:
+        #         if col == JOUEUR1:
+        #             s += "X"
+        #         elif col == JOUEUR2:
+        #             s += "O"
+        #         else:
+        #             s += " "
+        #         s += "|"
+        #     s += "\n"
+        print(f"jeux:\n{s}")
+
+    def to_string(self) -> str:
         s = ""
         for row in self.plateau:
             s += "|"
@@ -30,8 +45,7 @@ class TicTacToeGame:
                     s += " "
                 s += "|"
             s += "\n"
-        print("jeux:")
-        print(s)
+        return s
 
     def valeurCase(self, x, y) -> str:
         if x < 0 or x > 2 or y < 0 or y > 2:

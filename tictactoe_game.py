@@ -399,16 +399,24 @@ class JoueurMinMax3(JoueurAbstract):
 
     def parcourt(self, jeux: TicTacToeGame, no_joueur: int, niveaux: int, maxScore: bool) -> tuple[
                                                                                                  int, int, int] | None:
-        #jeux2 = TicTacToeGame(jeux.clone_plateau())
+        # jeux2 = TicTacToeGame(jeux.clone_plateau())
         # no_joueur = no_joueur
+        print(f"niveaux: {niveaux}, joueur: {no_joueur}, maxScore: {maxScore}")
+        print(f"jeux:\n{jeux.to_string()}")
 
         if jeux.finJeux():
-            if jeux.gagnant() == self.no_joueur:
-                return (100, 0, 0)
-            elif jeux.gagnant() == 0:
-                return (1, 0, 0)
-            else:
-                return (-100, 0, 0)
+            print(f"fin jeux:\n{jeux.to_string()}\ngagant={jeux.gagnant()}")
+            score = self.calcul_score(jeux, no_joueur)
+            if not maxScore:
+                score = -score
+            print(f"calcul score fin jeux: {score}")
+            return score, 0, 0
+            # if jeux.gagnant() == self.no_joueur:
+            #     return (100, 0, 0)
+            # elif jeux.gagnant() == 0:
+            #     return (1, 0, 0)
+            # else:
+            #     return (-100, 0, 0)
 
         liste_cases = jeux.cases_possibles()
 
@@ -416,31 +424,37 @@ class JoueurMinMax3(JoueurAbstract):
         for coup in liste_cases:
             jeux3 = TicTacToeGame(jeux.clone_plateau())
             jeux3.joue(no_joueur, coup[0], coup[1])
-            if niveaux <= 1:
+            print(f"coup: {coup}, joueur: {no_joueur}")
+            if niveaux < 1:
                 score = self.calcul_score(jeux3, no_joueur)
+                print(f"calcul score: {score}")
                 liste_score.append((score, coup[0], coup[1]))
             else:
                 no_joueur_suivant: int = self.autre_joueur(no_joueur)
                 score_enfants = self.parcourt(jeux3, no_joueur_suivant, niveaux - 1, not maxScore)
+                print(f"score enfant: {score_enfants}, niveaux {niveaux}")
                 if score_enfants is not None:
-                    score = score_enfants[0]
-                    if not maxScore:
-                        score = -score
+                    score = -score_enfants[0]
+                    # if not maxScore:
+                    # score = -score
                     liste_score.append((score, coup[0], coup[1]))
 
+        print(f"liste_score: {liste_score}, niveaux {niveaux}, joueur {no_joueur}")
         if len(liste_score) == 0:
             return None
         elif maxScore:
             res: tuple[int, int, int] | None = None
             for score in liste_score:
-                if res is None or res[0] > score[0]:
+                if res is None or res[0] < score[0]:
                     res = score
+            print(f"res max: {res}")
             return res
         else:
             res: tuple[int, int, int] | None = None
             for score in liste_score:
-                if res is None or res[0] < score[0]:
+                if res is None or res[0] > score[0]:
                     res = score
+            print(f"res min: {res}")
             return res
 
     def calcul_score(self, game: TicTacToeGame, no_joueur: int) -> int:

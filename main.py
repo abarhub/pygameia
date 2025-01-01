@@ -90,7 +90,7 @@ def jeux3():
 
 
 def jeux4():
-    nb_test=10
+    nb_test=50
     resultats={1:0, 2:0, 0:0}
 
     print("calcul des coups ...")
@@ -111,7 +111,7 @@ def jeux4():
         # joueur2=JoueurSimple(games, 2)
         #joueur2 = JoueurMinMax(games0, 2)
         #joueur2 = JoueurMinMax2(games0, 2)
-        joueur2 = JoueurMinMax3(games0, 2)
+        joueur2 = JoueurMinMax3(games0, 2, profondeur=9)
         partie = Partie(joueur1, joueur2)
         res=partie.partie()
         if res == 1:

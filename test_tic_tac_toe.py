@@ -171,7 +171,7 @@ class MyTestCase(unittest.TestCase):
         #jeux=TicTacToeGame()
         param_list=[
             ([(0,1),(0,0),(2,1)],2,(1,1),"test1"),
-            #([(1, 2, 0), (2, 0, 0), (1, 1, 2), (2, 0, 1), (1, 0, 2), (2, 1, 0), (1, 2, 1)], 2, (1, 1), "test2"),
+            ([(2, 0), (0, 0), (1, 2), (0, 1), (0, 2), (1, 0), (2, 1)], 2, (2, 2), "test2"),
         ]
         for (liste_coups, no_joueur,pos, msg_test) in param_list:
             with self.subTest(msg=f"test {msg_test}",param=[liste_coups, no_joueur,pos]):
@@ -188,6 +188,8 @@ class MyTestCase(unittest.TestCase):
         jeux = TicTacToeGame()
         no_joueur=1
         for coup in liste_coups:
+            if len(coup)!=2:
+                raise TypeError("coups should be a list of 2 items")
             jeux.joue(no_joueur, coup[0], coup[1])
             if no_joueur==1:
                 no_joueur=2
@@ -195,6 +197,40 @@ class MyTestCase(unittest.TestCase):
                 no_joueur=1
 
         return jeux
+
+
+    def test9(self):
+        jeux=self.initialise_jeux(liste_coups=[(2, 0), (0, 0), (1, 2), (0, 1), (0, 2), (1, 0), (2, 1)])
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 2)
+        #joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp=joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertEqual((2,2), tmp)
+
+    def test10(self):
+        jeux = self.initialise_jeux(liste_coups=[(2, 1), (0, 1), (0, 0), (1, 0), (1, 2), (0, 2), (2, 2)])
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 2)
+        # joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp = joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertTrue((2, 0)== tmp or (1, 1)==tmp)
+
+    def test11(self):
+        jeux = self.initialise_jeux(liste_coups=[(2, 1), (0, 0), (2, 0), (0, 1), (0, 2)])
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 2, profondeur=5)
+        # joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp = joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertEqual((2, 2), tmp)
 
 
 if __name__ == '__main__':

@@ -360,58 +360,79 @@ class JoueurMinMax3(JoueurAbstract):
 
     def trouve_coups(self, jeux) -> tuple[int, int]:
         # plateau = jeux.clone_plateau()
-        no_joueur = self.no_joueur
-        liste_cases = jeux.cases_possibles()
-        liste_coups = []
-        for coup in liste_cases:
-            jeux2 = TicTacToeGame(jeux.clone_plateau())
-            jeux2.joue(no_joueur, coup[0], coup[1])
-            score = self.parcourt(jeux2, self.no_joueur, self.profondeur, True)
-            liste_coups.append((coup[0], coup[1], score))
+        score = self.parcourt(jeux, self.no_joueur, self.profondeur, True)
+        if score is None:
+            raise Exception("Erreur de score")
+        else:
+            return score[1], score[2]
+        # no_joueur = self.no_joueur
+        # liste_cases = jeux.cases_possibles()
+        # liste_coups = []
+        # for coup in liste_cases:
+        #     jeux2 = TicTacToeGame(jeux.clone_plateau())
+        #     jeux2.joue(no_joueur, coup[0], coup[1])
+        #     score = self.parcourt(jeux2, self.no_joueur, self.profondeur, True)
+        #     liste_coups.append((coup[0], coup[1], score))
+        #
+        # score_max = None
+        # resultat = None
+        # for coup in liste_coups:
+        #     if score_max is None or coup[2] > score_max:
+        #         score_max = coup[2]
+        #         resultat = (coup[0], coup[1])
+        #
+        # return resultat
 
-        score_max = None
-        resultat = None
-        for coup in liste_coups:
-            if score_max is None or coup[2] > score_max:
-                score_max = coup[2]
-                resultat = (coup[0], coup[1])
-
-        return resultat
-
-    def parcourt(self, jeux: TicTacToeGame, no_joueur: int, niveaux: int, maxScore: bool) -> int:
-        jeux2 = TicTacToeGame(jeux.clone_plateau())
+    def parcourt(self, jeux: TicTacToeGame, no_joueur: int, niveaux: int, maxScore: bool) -> tuple[
+                                                                                                 int, int, int] | None:
+        #jeux2 = TicTacToeGame(jeux.clone_plateau())
         # no_joueur = no_joueur
-        liste_cases = jeux2.cases_possibles()
 
-        liste_score: list[int] = []
+        if jeux.finJeux():
+            if jeux.gagnant() == self.no_joueur:
+                return (100, 0, 0)
+            elif jeux.gagnant() == 0:
+                return (1, 0, 0)
+            else:
+                return (-100, 0, 0)
+
+        liste_cases = jeux.cases_possibles()
+
+        liste_score: list[tuple[int, int, int]] = []
         for coup in liste_cases:
-            jeux3 = TicTacToeGame(jeux2.clone_plateau())
+            jeux3 = TicTacToeGame(jeux.clone_plateau())
             jeux3.joue(no_joueur, coup[0], coup[1])
             if niveaux <= 1:
                 score = self.calcul_score(jeux3, no_joueur)
-                liste_score.append(score)
+                liste_score.append((score, coup[0], coup[1]))
             else:
-                no_joueur_suivant: int = 0
-                if no_joueur == 1:
-                    no_joueur_suivant = 2
-                elif no_joueur == 2:
-                    no_joueur_suivant = 1
-                score = self.parcourt(jeux3, no_joueur_suivant, niveaux - 1, not maxScore)
-                if not maxScore:
-                    score = -score
-                liste_score.append(score)
+                no_joueur_suivant: int = self.autre_joueur(no_joueur)
+                score_enfants = self.parcourt(jeux3, no_joueur_suivant, niveaux - 1, not maxScore)
+                if score_enfants is not None:
+                    score = score_enfants[0]
+                    if not maxScore:
+                        score = -score
+                    liste_score.append((score, coup[0], coup[1]))
 
         if len(liste_score) == 0:
-            return 0
+            return None
         elif maxScore:
-            return max(liste_score)
+            res: tuple[int, int, int] | None = None
+            for score in liste_score:
+                if res is None or res[0] > score[0]:
+                    res = score
+            return res
         else:
-            return min(liste_score)
+            res: tuple[int, int, int] | None = None
+            for score in liste_score:
+                if res is None or res[0] < score[0]:
+                    res = score
+            return res
 
     def calcul_score(self, game: TicTacToeGame, no_joueur: int) -> int:
         game_score = 0
-        ajout_double=1
-        ajout_triple=2
+        ajout_double = 1
+        ajout_triple = 5
         for ligne in range(len(game.plateau)):
 
             if no_joueur == 1:
@@ -426,66 +447,6 @@ class JoueurMinMax3(JoueurAbstract):
                     game_score += ajout_double
                 elif nb_joueur2 == 3:
                     game_score += ajout_triple
-
-            # for colonne in range(len(game.plateau[ligne])):
-            #     value = game.plateau[ligne][colonne]
-            #
-            #     if value == 0:
-            #         nb_joueur1 = 0
-            #         nb_joueur2 = 0
-            #         for n in range(len(game.plateau[ligne])):
-            #             if game.plateau[ligne][n] == JOUEUR1:
-            #                 nb_joueur1 += 1
-            #             elif game.plateau[ligne][n] == JOUEUR2:
-            #                 nb_joueur2 += 1
-            #         if no_joueur==1:
-            #             if nb_joueur1 == 2:
-            #                 game_score += 1
-            #             elif nb_joueur1 == 3:
-            #                 game_score += 2
-            #         elif no_joueur==2:
-            #             if nb_joueur2 == 2:
-            #                  game_score += 1
-            #             elif nb_joueur2 == 3:
-            #                 game_score += 2
-            #
-            #         nb_joueur1 = 0
-            #         nb_joueur2 = 0
-            #         for n in range(len(game.plateau)):
-            #             if game.plateau[n][colonne] == JOUEUR1:
-            #                 nb_joueur1 += 1
-            #             elif game.plateau[n][colonne] == JOUEUR2:
-            #                 nb_joueur2 += 1
-            #         if nb_joueur1 == 2:
-            #             game_score += 1
-            #         elif nb_joueur2 == 2:
-            #             game_score += 1
-            #
-            #         if ligne == colonne:
-            #             nb_joueur1 = 0
-            #             nb_joueur2 = 0
-            #             for n in range(len(game.plateau)):
-            #                 if game.plateau[n][n] == JOUEUR1:
-            #                     nb_joueur1 += 1
-            #                 elif game.plateau[n][n] == JOUEUR2:
-            #                     nb_joueur2 += 1
-            #             if nb_joueur1 == 2:
-            #                 game_score += 1
-            #             elif nb_joueur2 == 2:
-            #                 game_score += 1
-            #
-            #         if ligne + colonne == 2:
-            #             nb_joueur1 = 0
-            #             nb_joueur2 = 0
-            #             for n in range(len(game.plateau)):
-            #                 if game.plateau[2-n][n] == JOUEUR1:
-            #                     nb_joueur1 += 1
-            #                 elif game.plateau[2-n][n] == JOUEUR2:
-            #                     nb_joueur2 += 1
-            #             if nb_joueur1 == 2:
-            #                 game_score += 1
-            #             elif nb_joueur2 == 2:
-            #                 game_score += 1
 
         for colonne in range(len(game.plateau)):
             nb_joueur1 = 0
@@ -524,7 +485,6 @@ class JoueurMinMax3(JoueurAbstract):
             elif nb_joueur2 == 3:
                 game_score += ajout_triple
 
-        # if ligne + colonne == 2:
         nb_joueur1 = 0
         nb_joueur2 = 0
         for n in range(len(game.plateau)):
@@ -544,6 +504,14 @@ class JoueurMinMax3(JoueurAbstract):
                 game_score += ajout_triple
 
         return game_score
+
+    def autre_joueur(self, no_joueur: int) -> int:
+        if no_joueur == 1:
+            return 2
+        elif no_joueur == 2:
+            return 1
+        else:
+            raise Exception(f"joueur invalide{str(no_joueur)}")
 
 
 class Partie:

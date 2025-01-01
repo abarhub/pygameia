@@ -1,6 +1,6 @@
 import unittest
 
-from tictactoe_game import TicTacToeGame
+from tictactoe_game import TicTacToeGame, JoueurMinMax3, Games
 
 
 class MyTestCase(unittest.TestCase):
@@ -154,6 +154,22 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(True, jeux.finJeux())
         self.assertEqual(2, jeux.gagnant())
+
+
+    def test7(self):
+        jeux = TicTacToeGame()
+        jeux.joue(1, 0, 1)
+        jeux.joue(2, 0, 0)
+        jeux.joue(1, 2, 1)
+        #jeux.joue(2, 1, 2)
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 2)
+        #joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp=joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertEqual((1,1), tmp)
 
 
 if __name__ == '__main__':

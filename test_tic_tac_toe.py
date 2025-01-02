@@ -232,6 +232,28 @@ class MyTestCase(unittest.TestCase):
         print(tmp)
         self.assertEqual((2, 2), tmp)
 
+    def test12(self):
+        jeux=self.initialise_jeux(liste_coups=[(0,0),(0,1),(0,2),(2,1),(1,0)])
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 2)
+        #joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp=joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertEqual((1,1), tmp)
+
+    def test13(self):
+        jeux=self.initialise_jeux(liste_coups=[(0,1),(0,0),(2,1),(0,2)])
+        jeux.afficher()
+        games = Games()
+        joueur2 = JoueurMinMax3(games, 1)
+        #joueur2.parcourt(jeux,2,1,True)
+        # corriger le calcul du score
+        tmp=joueur2.trouve_coups(jeux)
+        print(tmp)
+        self.assertEqual((1,1), tmp)
+
 
 if __name__ == '__main__':
     unittest.main()

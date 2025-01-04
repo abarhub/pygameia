@@ -182,32 +182,84 @@ game_over = False
 
 # ...
 
-while not game_over:
-    if current_player == 'X':
-        # Human player's turn
-        print_board(board)
-        row = int(input("Enter the row (0-2): "))
-        col = int(input("Enter the column (0-2): "))
-        action = (row, col)
-    else:
-        # Trained agent's turn
-        action = choose_action(board, exploration_rate=0)
-
-    row, col = action
-    board[row, col] = current_player
-
-    game_over, winner = is_game_over(board)
-
-    if game_over:
-        print_board(board)
-        if winner == 'X':
-            print("Human player wins!")
-        elif winner == 'O':
-            print("Agent wins!")
-        else:
-            print("It's a draw!")
-    else:
-        current_player = players[(players.index(current_player) + 1) % num_players]
+# while not game_over:
+#     if current_player == 'X':
+#         # Human player's turn
+#         print_board(board)
+#         row = int(input("Enter the row (0-2): "))
+#         col = int(input("Enter the column (0-2): "))
+#         action = (row, col)
+#     else:
+#         # Trained agent's turn
+#         action = choose_action(board, exploration_rate=0)
+#
+#     row, col = action
+#     board[row, col] = current_player
+#
+#     game_over, winner = is_game_over(board)
+#
+#     if game_over:
+#         print_board(board)
+#         if winner == 'X':
+#             print("Human player wins!")
+#         elif winner == 'O':
+#             print("Agent wins!")
+#         else:
+#             print("It's a draw!")
+#     else:
+#         current_player = players[(players.index(current_player) + 1) % num_players]
 
 #agent_win_percentage = (agent_wins / num_games) * 100
 #print("Agent win percentage: {:.2f}%".format(agent_win_percentage))
+
+# Main Q-learning algorithm
+num_draws = 0  # Counter for the number of draws
+agent_wins = 0  # Counter for the number of wins by the agent
+num_games=0
+
+for episode in range(num_episodes):
+    board = np.array([['-', '-', '-'],
+                      ['-', '-', '-'],
+                      ['-', '-', '-']])
+
+    current_player = random.choice(players)  # Randomly choose the current player
+    game_over = False
+    num_games+=1
+
+    while not game_over:
+        action = choose_action(board, exploration_rate)  # Choose an action using the exploration rate
+
+        row, col = action
+        board[row, col] = current_player  # Update the board with the current player's move
+
+        game_over, winner = is_game_over(board)  # Check if the game is over and determine the winner
+
+        if game_over:
+            if winner == current_player:  # Agent wins
+                reward = 1
+                agent_wins += 1
+            elif winner == 'draw':  # Game ends in a draw
+                reward = 0
+                num_draws += 1
+            else:  # Agent loses
+                reward = -1
+            update_q_table(board_to_string(board), action, board, reward)  # Update the Q-table
+        else:
+            current_player = players[(players.index(current_player) + 1) % num_players]  # Switch to the next player
+
+        if not game_over:
+            next_state = board_next_state(action)
+            update_q_table(board_to_string(board), action, next_state, 0)  # Update the Q-table with the next state
+
+    exploration_rate *= 0.99  # Decrease the exploration rate over time
+
+# Play multiple games between the trained agent and itself
+agent_win_percentage = (agent_wins / num_games) * 100
+draw_percentage = (num_draws / num_games) * 100
+
+print("Agent win percentage: {:.2f}%".format(agent_win_percentage))
+print("Draw percentage: {:.2f}%".format(draw_percentage))
+print(f"Number of games : {num_games}")
+
+
+
